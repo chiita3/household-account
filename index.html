@@ -402,6 +402,9 @@ function renderDash() {
   document.getElementById("d-asset-month").textContent = dashMonth;
   const abox = document.getElementById("d-asset-items"); abox.innerHTML = "";
   if (!akeys.length) abox.innerHTML = '<p class="muted">この月の資産記録はありません</p>';
+  const aorder = {};
+  S.assetItems.forEach((r, i) => { aorder[String(r[0]) + "|" + String(r[1])] = Number(r[3]) || (i + 1); });
+  akeys.sort((x, y) => (aorder[x] !== undefined ? aorder[x] : 9999) - (aorder[y] !== undefined ? aorder[y] : 9999));
   const agroups = {};
   akeys.forEach(k => { const parts = k.split("|"); (agroups[parts[0]] = agroups[parts[0]] || []).push([parts[1], monthVals[k]]); });
   Object.entries(agroups).forEach(([c, its]) => {
