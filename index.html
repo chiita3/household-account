@@ -135,8 +135,6 @@
         </summary>
         <div id="d-asset-items" style="margin-top:8px"></div>
       </details>
-      <p class="label" style="margin-top:10px">総資産の推移（12ヶ月）</p>
-      <div class="cols" id="d-asset-trend" style="margin-bottom:10px"></div>
       <details><summary class="muted">資産を記録する（月1回）</summary>
         <div style="margin-top:8px">
           <input type="month" id="a-month">
@@ -400,7 +398,7 @@ function renderDash() {
   S.assets.forEach(r => { const m = recMonth(r[1]); (perMonth[m] = perMonth[m] || {})[r[2] + "|" + r[3]] = Number(r[4]) || 0; });
   const monthVals = perMonth[dashMonth] || {};
   const akeys = Object.keys(monthVals);
-  document.getElementById("d-asset-total").textContent = yen(akeys.reduce((s, k) => s + monthVals[k], 0));
+  document.getElementById("d-asset-total").textContent = yen(akeys.filter(k => k.split("|")[0] !== "貸出").reduce((s, k) => s + monthVals[k], 0));
   document.getElementById("d-asset-month").textContent = dashMonth;
   const abox = document.getElementById("d-asset-items"); abox.innerHTML = "";
   if (!akeys.length) abox.innerHTML = '<p class="muted">この月の資産記録はありません</p>';
@@ -409,23 +407,13 @@ function renderDash() {
   Object.entries(agroups).forEach(([c, its]) => {
     const sub = its.reduce((s, x) => s + x[1], 0);
     const h = document.createElement("div"); h.className = "rec";
-    h.innerHTML = '<div class="l"><div class="cat" style="font-weight:600">' + c + '</div></div><div class="amt">' + yen(sub) + "</div>";
+    h.innerHTML = '<div class="l"><div class="cat" style="font-weight:600">' + c + (c === "貸出" ? '<span style="font-weight:400;color:var(--ink-2);font-size:12px">（合計対象外）</span>' : "") + '</div></div><div class="amt">' + yen(sub) + "</div>";
     abox.appendChild(h);
     its.forEach(it => {
       const d = document.createElement("div"); d.className = "rec";
       d.innerHTML = '<div class="l"><div class="sub2" style="padding-left:12px">' + it[0] + '</div></div><div class="amt" style="font-weight:400;font-size:14px">' + yen(it[1]) + "</div>";
       abox.appendChild(d);
     });
-  });
-  const atEl = document.getElementById("d-asset-trend"); atEl.innerHTML = "";
-  const aTotals = months.map(m => { const mv = perMonth[m] || {}; return Object.values(mv).reduce((s, v) => s + v, 0); });
-  const amax = Math.max(...aTotals, 1);
-  months.forEach((m, i) => {
-    const col = document.createElement("div"); col.className = "col";
-    const h = Math.max(Math.round(aTotals[i] / amax * 90), 2);
-    col.innerHTML = '<i style="height:' + h + 'px"></i><span>' + m.slice(5) + "月</span>";
-    col.title = m + " " + yen(aTotals[i]);
-    atEl.appendChild(col);
   });
 
   const itemSel = document.getElementById("a-item");
