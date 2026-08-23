@@ -335,7 +335,7 @@ function editRecord(r) {
 function monthExpenseRows(month) {
   const rows = [];
   S.expenses.forEach(r => { if (recMonth(r[1]) === month) rows.push({ major: r[2], mid: r[3], sub: r[4], amt: Number(r[5]) || 0 }); });
-  S.history.forEach(r => { if (String(r[0]) === month) rows.push({ major: r[1], mid: r[2], sub: r[3], amt: Number(r[4]) || 0 }); });
+  S.history.forEach(r => { if (recMonth(r[0]) === month) rows.push({ major: r[1], mid: r[2], sub: r[3], amt: Number(r[4]) || 0 }); });
   return rows;
 }
 
@@ -347,7 +347,7 @@ function renderDash() {
   document.getElementById("d-total").textContent = yen(total);
   document.getElementById("d-fixed").textContent = yen(fixed);
   document.getElementById("d-var").textContent = yen(total - fixed);
-  const inc = S.incomes.filter(r => String(r[1]) === dashMonth).reduce((s, r) => s + (Number(r[3]) || 0), 0);
+  const inc = S.incomes.filter(r => recMonth(r[1]) === dashMonth).reduce((s, r) => s + (Number(r[3]) || 0), 0);
   document.getElementById("d-income").textContent = yen(inc);
 
   const bEl = document.getElementById("d-budgets"); bEl.innerHTML = "";
@@ -390,7 +390,7 @@ function renderDash() {
   });
 
   const byMonth = {};
-  S.assets.forEach(r => { const m = String(r[1]); byMonth[m] = (byMonth[m] || 0) + (Number(r[4]) || 0); });
+  S.assets.forEach(r => { const m = recMonth(r[1]); byMonth[m] = (byMonth[m] || 0) + (Number(r[4]) || 0); });
   const ams = Object.keys(byMonth).sort();
   if (ams.length) {
     const last = ams[ams.length - 1];
